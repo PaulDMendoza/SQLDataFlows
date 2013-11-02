@@ -35,37 +35,47 @@ namespace SQLDataFlows
 
         public void Execute()
         {
-            using (Source)
-            {
-                Source.Open();
-                try
-                {
-                    foreach (var d in Destinations)
-                    {
-                        d.DataFlow.Open();
-                    }
+            ExecuteAsync().Wait();
+        }
 
-                    while (Source.Read())
+        public async Task ExecuteAsync()
+        {
+            await Task.Run(() =>
+                {
+                    using (Source)
                     {
-                        T item = Source.GetItem();
-                        foreach (var d in Destinations)
+                        Source.Open();
+                        try
                         {
-                            d.DataFlow.Write(d.Mapping(item));
+                            foreach (var d in Destinations)
+                            {
+                                d.DataFlow.Open();
+                            }
+
+                            while (Source.Read())
+                            {
+                                T item = Source.GetItem();
+                                foreach (var d in Destinations)
+                                {
+                                    d.DataFlow.Write(d.Mapping(item));
+                                }
+                            }
+                            foreach (var d in Destinations)
+                            {
+                                d.DataFlow.WritesCompleted();
+                            }
+                        }
+                        finally
+                        {
+                            foreach (var d in Destinations)
+                            {
+                                using (d.DataFlow)
+                                {
+                                }
+                            }
                         }
                     }
-                    foreach (var d in Destinations)
-                    {
-                        d.DataFlow.WritesCompleted();
-                    }
-                }
-                finally
-                {
-                    foreach (var d in Destinations)
-                    {
-                        using (d.DataFlow) { }
-                    }
-                }
-            }
+                });
         }
     }
 
@@ -75,6 +85,11 @@ namespace SQLDataFlows
             where T : new()
             where TOutput : new()
         {
+            if (mapping == null)
+            {
+               throw new NullReferenceException("mapping parameter cannot be null"); 
+            }
+
             flow.Destinations.Add(new Flow<T>.Destination()
             {
                 DataFlow = destination,

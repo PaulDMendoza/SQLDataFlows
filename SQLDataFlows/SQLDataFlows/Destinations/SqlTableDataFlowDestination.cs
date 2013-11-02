@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SQLDataFlows.Destinations
 {
-    public class SqlDataDestination <TOutput>: IDataFlowDestination<TOutput> where TOutput : new()
+    public class SqlTableDataFlowDestination <TOutput>: IDataFlowDestination<TOutput> where TOutput : new()
     {
         private readonly string _connectionString;
         private readonly string _tableName;
@@ -19,7 +19,7 @@ namespace SQLDataFlows.Destinations
 
         private PropertyInfo[] _properties; 
 
-        public SqlDataDestination(string connectionString, string tableName)
+        public SqlTableDataFlowDestination(string connectionString, string tableName)
         {
             _connectionString = connectionString;
             _tableName = tableName;
@@ -29,7 +29,7 @@ namespace SQLDataFlows.Destinations
         {
             if (_connection != null)
             {
-                throw new Exception("Cannot open SqlDataSource connection twice");
+                throw new Exception("Cannot open SqlTableDataFlowSource connection twice");
             }
             _connection = new SqlConnection(this._connectionString);
             _connection.Open();
@@ -58,7 +58,7 @@ namespace SQLDataFlows.Destinations
             }
             _dataTable.Rows.Add(row);
 
-            if (_dataTable.Rows.Count > 100)
+            if (_dataTable.Rows.Count > 500)
             {
                 BulkCopy();
             }

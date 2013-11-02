@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace SQLDataFlows.Sources
 {
-    public class SqlDataSource<T> : IDataFlowSource<T> where T: new()
+    public class SqlTableDataFlowSource<T> : IDataFlowSource<T> where T: new()
     {
         private readonly string _connectionString;
         private readonly string _sql;
         private SqlConnection _connection;
         private SqlDataReader _dataReader;
         
-        public SqlDataSource(string connectionString, string sql)
+        public SqlTableDataFlowSource(string connectionString, string sql)
         {
             _connectionString = connectionString;
             _sql = sql;
@@ -30,7 +30,7 @@ namespace SQLDataFlows.Sources
         {
             if (_connection != null)
             {
-                throw new Exception("Cannot open SqlDataSource connection twice");
+                throw new Exception("Cannot open SqlTableDataFlowSource connection twice");
             }
             _connection = new SqlConnection(this._connectionString);
             _connection.Open();

@@ -31,8 +31,8 @@ namespace SQLDataFlows.PerformanceApp
                 var stw = new Stopwatch();
                 stw.Start();
 
-                Flow.OutOf(new SqlDataSource<TableSource>(_connStr, "select * from TableSource"))
-                    .Into(new SqlDataDestination<TableDestination>(_connStr, "TableDestination"), mapping: source => new TableDestination() { Name = source.Name, State = source.State })
+                Flow.OutOf(new SqlTableDataFlowSource<TableSource>(_connStr, "select * from TableSource"))
+                    .Into(new SqlTableDataFlowDestination<TableDestination>(_connStr, "TableDestination"), mapping: source => new TableDestination() { Name = source.Name, State = source.State })
                     .Execute();
 
                 stw.Stop();
